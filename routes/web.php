@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\YandexController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,7 +23,10 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/yandex/settings', [\App\Http\Controllers\YandexSettingsController::class, 'index'])
-        ->name('yandex.settings');
-    Route::post('/yandex/settings', [\App\Http\Controllers\YandexSettingsController::class, 'store']);
+
+    // Получить настройки текущего пользователя
+    Route::get('/yandex-settings', [YandexController::class, 'index']);
+
+    // Создать настройки
+    Route::post('/yandex-settings', [YandexController::class, 'store']);
 });

@@ -15,6 +15,9 @@ import { createApp } from 'vue';
 
 const app = createApp({});
 
+import YandexSettings from './components/YandexSettings.vue';
+app.component('yandex-settings', YandexSettings);
+
 import ExampleComponent from './components/ExampleComponent.vue';
 app.component('example-component', ExampleComponent);
 

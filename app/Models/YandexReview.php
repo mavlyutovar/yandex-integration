@@ -5,13 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $setting_id
+ * @property string $published_at
+ * @property string $description
+ * @property string $author_name
+ * @property string $author_contact
+ * @property double $rating
+ */
 class YandexReview extends Model
 {
     protected $table = 'yandex_reviews';
 
     protected $fillable = [
         'setting_id',
-        'company_name',
         'published_at',
         'description',
         'author_name',

@@ -17,6 +17,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('yandex_url')->nullable(); // ссылка на карточку
+            $table->string('company_name')->nullable(); // Название карточки
+            $table->double('company_rating')->nullable(); // Рейтинг карточки
+            $table->integer('company_review_count')->nullable(); // Количество отзывов
             $table->timestamps();
         });
     }
