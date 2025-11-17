@@ -15,7 +15,7 @@ class YandexRepository
     {
         return YandexSetting::query()
             ->where('user_id', $userId)
-            ->with(['reviews'])
+            ->with(['lastReviews'])
             ->first();
     }
 

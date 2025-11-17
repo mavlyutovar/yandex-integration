@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Data\YandexCompanyInfoData;
+use App\Data\YandexSettingData;
 use App\Models\YandexSetting;
 use App\Repositories\YandexRepository;
 
@@ -13,10 +14,18 @@ class YandexService
     )
     {
     }
-    public function getUrlInfoByUserId(int $userId): YandexSetting|null
+
+    public function getUrlInfoByUserId(int $userId): ?YandexSettingData
     {
-        return $this->repository->getSettingAndData($userId);
+        $companyInfo = $this->repository->getSettingAndData($userId);
+
+        if (!$companyInfo) {
+            return null;
+        }
+
+        return YandexSettingData::from($companyInfo);
     }
+
 
     public function storeReviews(int $userId, string $url, YandexCompanyInfoData $companyInfo, array $reviews): void
     {

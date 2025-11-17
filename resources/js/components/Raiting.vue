@@ -2,19 +2,23 @@
     <div class="rating-component-detailed">
         <div class="rating-header">
             <div class="rating-main">
-                <div class="rating-value">4.7</div>
+                <div class="rating-value">{{ rating }}</div>
             </div>
 
-            <RatingStars :value="4.7" />
+            <RatingStars :value="rating" />
         </div>
         <hr style="margin-bottom: 13px; margin-top: 0px">
-        <div class="reviews-count">Всего отзывов: 1 145</div>
+        <div class="reviews-count">Всего отзывов: {{ count }}</div>
     </div>
 </template>
 
 <script setup>
 import RatingStars from './RatingStars.vue'
 
+defineProps({
+    rating: Number,
+    count: Number,
+})
 </script>
 
 <style scoped>

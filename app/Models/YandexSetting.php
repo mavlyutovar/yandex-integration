@@ -35,4 +35,11 @@ class YandexSetting extends Model
     {
         return $this->hasMany(YandexReview::class, 'setting_id', 'id');
     }
+
+    public function lastReviews(): HasMany
+    {
+        return $this->hasMany(YandexReview::class, 'setting_id')
+            ->orderByDesc('published_at')
+            ->limit(10);
+    }
 }

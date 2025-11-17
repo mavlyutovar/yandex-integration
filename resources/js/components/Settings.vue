@@ -1,22 +1,66 @@
 <template>
-  <div class="reviews-page">
-    <div class="page-header">
-      <h2>Подключить Яндекс</h2>
-      <div class="content">
-        <span class="content-text"> Укажите ссылку на Яндекс, пример
+    <div class="reviews-page">
+        <div class="page-header">
+            <h2>Подключить Яндекс</h2>
+
+            <div class="content">
+        <span class="content-text">
+          Укажите ссылку на Яндекс, пример
           <a href="https://yandex.ru/maps/org/samoye_populyarnoye_kafe/1010501395/reviews/">
             https://yandex.ru/maps/org/samoye_populyarnoye_kafe/1010501395/reviews/
           </a>
         </span>
-        <input class="content-input">
-        <button class="content-btn">
-          Сохранить
-        </button>
-      </div>
-    </div>
+                <input
+                    class="content-input"
+                    v-model="yandexUrl"
+                    placeholder="https://yandex.ru/maps/org/samoye_populyarnoye_kafe/1010501395/reviews/"
+                >
 
-  </div>
+                <button
+                    class="content-btn"
+                    :disabled="isLoading"
+                    @click="saveYandexSettings"
+                >
+                    {{ isLoading ? 'Сохранение...' : 'Сохранить' }}
+                </button>
+
+                <div v-if="message" style="margin-top:10px;">
+                    {{ message }}
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
+
+
+<script setup>
+import { ref } from 'vue'
+import axios from 'axios'
+
+const yandexUrl = ref('')
+const isLoading = ref(false)
+const message = ref(null)
+
+const saveYandexSettings = async () => {
+    message.value = null
+    isLoading.value = true
+
+    try {
+        const response = await axios.post('/yandex-settings', {
+            yandex_url: yandexUrl.value,
+        })
+
+        if (response.status === 200) {
+            message.value = 'Успешно сохранено!'
+        }
+    } catch (err) {
+        message.value = 'Ошибка сохранения'
+        console.error('Ошибка POST /yandex-settings', err)
+    }
+
+    isLoading.value = false
+}
+</script>
 
 
 <style scoped>
@@ -48,7 +92,6 @@
 }
 .content-input {
   border: 1px solid #f6f8fa;
-  color: transparent;
   border-radius: 6px;
   margin-top: 10px;
 }

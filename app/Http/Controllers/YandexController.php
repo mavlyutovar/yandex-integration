@@ -22,10 +22,9 @@ class YandexController extends Controller
     }
     public function index(Request $request): JsonResponse
     {
-        return response()->json([
-            'success' => true,
-            'data' => $this->yandexService->getUrlInfoByUserId(Auth::id()),
-        ]);
+        return response()->json(
+            $this->yandexService->getUrlInfoByUserId(Auth::id())
+        );
     }
 
     /**
@@ -38,9 +37,8 @@ class YandexController extends Controller
         ]);
         StoreYandexReviewAction::run(Auth::id(), $validated['yandex_url']);
 
-        return response()->json([
-            'success' => true,
-            'data' => $this->yandexService->getUrlInfoByUserId(Auth::id()),
-        ]);
+        return response()->json(
+            $this->yandexService->getUrlInfoByUserId(Auth::id())
+        );
     }
 }

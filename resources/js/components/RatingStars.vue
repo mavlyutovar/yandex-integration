@@ -1,8 +1,13 @@
 <template>
     <div class="rating-stars">
-    <span v-for="index in maxStars" :key="index" class="star">
-      {{ index <= fullStars ? '⭐' : '☆' }}
-    </span>
+        <img
+            v-for="index in maxStars"
+            :key="index"
+            class="star"
+            :src="index <= fullStars ? '/images/star-full.svg' : '/images/star-empty.svg'"
+            alt="star"
+            :style="{ width: size + 'px', height: size + 'px' }"
+        />
     </div>
 </template>
 
@@ -17,6 +22,10 @@ const props = defineProps({
     maxStars: {
         type: Number,
         default: 5
+    },
+    size: {
+        type: Number,
+        default: 24
     }
 })
 
@@ -24,8 +33,9 @@ const fullStars = computed(() => Math.floor(props.value))
 </script>
 
 <style scoped>
-.star {
-    font-size: 18px;
-    color: #fbbf24;
+
+.rating-stars {
+    display: flex;
+    gap: 4px;
 }
 </style>

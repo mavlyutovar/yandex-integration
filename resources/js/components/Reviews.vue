@@ -1,9 +1,20 @@
 <template>
     <div class="reviews-page">
-        <button class="review-yandex">
+        <button class="review-yandex" @click="openYandex">
             📍 Яндекс Карты
         </button>
-        <div class="reviews-content">
+
+        <div v-if="loading" class="status-screen">
+            Загрузка...
+        </div>
+        <div v-else-if="error" class="status-screen">
+            Ошибка загрузки данных 😢
+        </div>
+        <div v-else-if="!companyRating || reviews.length === 0" class="status-screen">
+            Нет данных для отображения
+        </div>
+
+        <div v-else class="reviews-content">
             <div class="reviews-list">
                 <div
                     v-for="review in filteredReviews"
@@ -15,77 +26,99 @@
                             <div class="review-date-branch">
                                 <div class="left-info">
                                     <div class="text-branch-info">{{ review.date }}</div>
-                                    <div class="text-branch-info">{{ review.branch }} 📍</div>
+                                    <div class="text-branch-info">{{ companyName }} 📍</div>
                                 </div>
-                                <RatingStars :value="review.rating" />
+                                <RatingStars :value="review.rating" :size="14" />
                             </div>
                         </div>
 
 
                         <div class="reviewer-info">
                             <strong class="text-branch-info">{{ review.author }}</strong>
-                            <span class="text-branch-info" style="font-size: 10px">{{ review.phone }}</span>
+                            <span v-if="review.contact" class="text-branch-info" style="font-size: 10px">
+                                <a :href="review.contact" target="_blank" rel="noopener noreferrer">
+                                    {{ review.contact }}
+                                </a>
+                            </span>
                         </div>
 
                         <div class="text-branch-info" style="font-weight: 400;">{{ review.text }}</div>
                     </div>
                 </div>
             </div>
-            <Raiting>
-
-            </Raiting>
+            <Raiting
+                :rating="companyRating"
+                :count="companyReviewCount"
+            />
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
 import Raiting from './Raiting.vue'
-import RatingStars from "./RatingStars.vue";
+import RatingStars from "./RatingStars.vue"
 
 const activeFilter = ref('all')
 
-const reviews = [
-    {
-        id: 1,
-        author: 'Наталья',
-        phone: '+7 900 540 40 40',
-        date: '12.09.2022 14:22',
-        branch: 'Филиал 1',
-        text: 'Так, с чего начать... Разнообразная алкогольная продукция, множество закусок и обычных блюд. Кухня вкусная и Разнообразная, от супа и салатов до мясных продуктов. Персонал молодые девушки, общительная и доброжелательные, всегда подскажут, вовремя принесут и вызовут такси. Отдыхали на летней веранде, свежо и тепло, в общем самое то в жаркую погоду. Сами залы не сильно рассмотрел, но видел что они удобные и просторные.',
-        type: 'positive',
-        rating: 5
-    },
-    {
-        id: 2,
-        author: 'Наталья',
-        phone: '+7 900 540 40 40',
-        date: '12.09.2022 14:22',
-        branch: 'Филиал 1',
-        text: 'Так, с чего начать... Разнообразная алкогольная продукция, множество закусок и обычных блюд. Кухня вкусная и Разнообразная, от супа и салатов до мясных продуктов. Персонал молодые девушки, общительная и доброжелательные, всегда подскажут, вовремя принесут и вызовут такси. Отдыхали на летней веранде, свежо и тепло, в общем самое то в жаркую погоду. Сами залы не сильно рассмотрел, но видел что они удобные и просторные.',
-        type: 'positive',
-        rating: 5
-    },
-    {
-        id: 3,
-        author: 'Наталья',
-        phone: '+7 900 540 40 40',
-        date: '12.09.2022 14:22',
-        branch: 'Филиал 1',
-        text: 'Так, с чего начать... Разнообразная алкогольная продукция, множество закусок и обычных блюд. Кухня вкусная и Разнообразная, от супа и салатов до мясных продуктов. Персонал молодые девушки, общительная и доброжелательные, всегда подскажут, вовремя принесут и вызовут такси. Отдыхали на летней веранде, свежо и тепло, в общем самое то в жаркую погоду. Сами залы не сильно рассмотрел, но видел что они удобные и просторные.',
-        type: 'positive',
-        rating: 5
+const loading = ref(true)
+const error = ref(false)
+
+const reviews = ref([])
+const companyName = ref(null)
+const companyRating = ref(null)
+const companyReviewCount = ref(null)
+
+const loadData = async () => {
+    try {
+        loading.value = true
+        error.value = false
+
+        const response = await axios.get('/yandex-settings')
+
+        const rawReviews = Array.isArray(response.data.last_reviews)
+            ? response.data.last_reviews
+            : []
+
+        reviews.value = rawReviews.map(r => ({
+            id: r.id,
+            author: r.author_name ?? '',
+            contact: r.author_contact ?? '',
+            date: r.published_at ?? '',
+            text: r.description ?? '',
+            rating: r.rating,
+        }))
+
+
+        companyName.value = response.data.company_name
+        companyRating.value = response.data.company_rating
+        companyReviewCount.value = response.data.company_review_count
+
+        loading.value = false
+    } catch (err) {
+        console.error('Ошибка загрузки данных', err)
+        error.value = true
+        loading.value = false
     }
-]
+}
+
+
+onMounted(loadData)
+
+const openYandex = () => {
+    window.open('https://yandex.ru/maps/', '_blank')
+}
 
 const filteredReviews = computed(() => {
-    if (activeFilter.value === 'all') return reviews
-    if (activeFilter.value === 'positive') return reviews.filter(r => r.rating >= 4)
-    if (activeFilter.value === 'negative') return reviews.filter(r => r.rating <= 2)
-    if (activeFilter.value === 'new') return reviews.slice(0, 5)
-    return reviews
+    if (activeFilter.value === 'all') return reviews.value
+    if (activeFilter.value === 'positive') return reviews.value.filter(r => r.rating >= 4)
+    if (activeFilter.value === 'negative') return reviews.value.filter(r => r.rating <= 2)
+    if (activeFilter.value === 'new') return reviews.value.slice(0, 5)
+    return reviews.value
 })
 </script>
+
 
 <style scoped>
 
@@ -169,6 +202,19 @@ const filteredReviews = computed(() => {
     border-bottom: 1px solid #f3f4f6;
     padding-bottom: 24px;
 }
+
+.status-screen {
+    width: 100%;
+    height: 50vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: #6C757D;
+    text-align: center;
+}
+
 
 @media (max-width: 1024px) {
     .reviews-content {

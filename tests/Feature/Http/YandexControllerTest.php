@@ -10,9 +10,9 @@ class YandexControllerTest extends TestCase
     //php artisan test --filter YandexControllerTest::test_store_yandex_settings
     public function test_store_yandex_settings()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         $user = \App\Models\User::factory()->create();
-
-        $this->actingAs($user);
+        $this->actingAs($user, 'web');
 
         $response = $this->post('/yandex-settings', [
             'yandex_url' => 'https://yandex.ru/maps/org/samoye_populyarnoye_kafe/1010501395/reviews/',
@@ -31,8 +31,9 @@ class YandexControllerTest extends TestCase
     //php artisan test --filter YandexControllerTest::test_get_yandex_settings
     public function test_get_yandex_settings()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         $user = \App\Models\User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($user, 'web');
 
         $this->post('/yandex-settings', [
             'yandex_url' => 'https://yandex.ru/maps/org/samoye_populyarnoye_kafe/1010501395/reviews/',
@@ -41,19 +42,17 @@ class YandexControllerTest extends TestCase
         $response = $this->get('/yandex-settings');
 
         $response->assertStatus(200)->assertJsonStructure([
-            'data' => [
-                'yandex_url',
-                'company_name',
-                'company_rating',
-                'company_review_count',
-                'reviews' => [
-                    '*' => [
-                        'id',
-                        'author_name',
-                        'description',
-                        'rating',
-                        'published_at',
-                    ]
+            'yandex_url',
+            'company_name',
+            'company_rating',
+            'company_review_count',
+            'reviews' => [
+                '*' => [
+                    'id',
+                    'author_name',
+                    'description',
+                    'rating',
+                    'published_at',
                 ]
             ]
         ]);

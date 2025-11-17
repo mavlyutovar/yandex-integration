@@ -14,7 +14,6 @@
                     :class="{ active: $route.name === item.route }"
                     @click="navigateTo(item.route)"
                 >
-                    <span class="icon">{{ item.icon }}</span>
                     <span class="text">{{ item.text }}</span>
                 </li>
             </ul>
@@ -35,15 +34,15 @@ const accountName = ref('Название Аккаунта')
 onMounted(async () => {
     try {
         const response = await axios.get('/user-info')
-        accountName.value = response.data.data.name
+        accountName.value = response.data.name
     } catch (error) {
         console.error('Ошибка загрузки user-info:', error)
     }
 })
 
 const menuItems = [
-    { id: 'reviews', text: 'Отзывы', icon: '⭐', route: 'Reviews' },
-    { id: 'RightContent', text: 'Настройка', icon: '⚙️', route: 'RightContent' },
+    { id: 'reviews', text: 'Отзывы', route: 'Reviews' },
+    { id: 'RightContent', text: 'Настройка', route: 'RightContent' },
 ]
 
 const navigateTo = (routeName) => {
@@ -101,12 +100,6 @@ const navigateTo = (routeName) => {
     background: #FFFFFF;
     box-shadow: 0px 2px 1px 0px #00000005;
     border-radius: 12px;
-}
-
-.sidebar-nav .icon {
-    font-size: 1.3rem;
-    width: 24px;
-    text-align: center;
 }
 
 .sidebar-nav .text {
